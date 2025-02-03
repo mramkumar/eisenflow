@@ -4,6 +4,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { PlusCircle, CheckCircle, Circle, Trash2, Play, StopCircle } from "lucide-react";
 import styled from "styled-components";
 import "./App.css";
+import TaskPopup from "./components/TaskPopup";
 
 const AppContainer = styled.div`
   display: flex;
@@ -38,20 +39,6 @@ const QuadrantCell = styled.td`
   overflow-y: auto;
   padding: 15px;
   border: 1px solid #ddd;
-`;
-
-const TaskInput = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-`;
-
-const TaskInputField = styled.input`
-  flex: 1;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  margin-right: 10px;
 `;
 
 const TaskListContainer = styled.div`
@@ -116,23 +103,30 @@ const TaskDueDate = styled.input`
   font-size: 0.9rem;
 `;
 
+const AddTaskIcon = styled.span`
+  cursor: pointer;
+  color: #2196f3;
+  font-size: 2rem;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+`;
+
 function App() {
   const [tasks, setTasks] = useState([]);
-  const [taskInputs, setTaskInputs] = useState({ 1: "", 2: "", 3: "", 4: "" });
+  const [showPopup, setShowPopup] = useState(false);
 
-  const addTask = (quadrant) => {
-    if (!taskInputs[quadrant].trim()) return;
-    const newTask = {
+  const addTask = (newTask) => {
+    const task = {
       id: Date.now(),
-      text: taskInputs[quadrant],
-      quadrant,
+      text: newTask.text,
+      quadrant: newTask.quadrant,
       completed: false,
-      dueDate: null,
+      dueDate: newTask.dueDate,
       timer: 0,
       isRunning: false,
     };
-    setTasks([...tasks, newTask]);
-    setTaskInputs({ ...taskInputs, [quadrant]: "" });
+    setTasks([...tasks, task]);
   };
 
   const moveTask = (taskId, newQuadrant) => {
@@ -141,6 +135,15 @@ function App() {
         task.id === taskId ? { ...task, quadrant: newQuadrant } : task
       )
     );
+  };
+
+  const reorderTask = (taskId, targetIndex, targetQuadrant) => {
+    const taskIndex = tasks.findIndex((task) => task.id === taskId);
+    const task = tasks[taskIndex];
+    const updatedTasks = [...tasks];
+    updatedTasks.splice(taskIndex, 1);
+    updatedTasks.splice(targetIndex, 0, { ...task, quadrant: targetQuadrant });
+    setTasks(updatedTasks);
   };
 
   const setTaskDueDate = (taskId, dueDate) => {
@@ -191,7 +194,10 @@ function App() {
           <thead>
             <tr>
               <th colSpan="3" className="matrix-title">
-                Eisenhower Matrix
+                EisenFlow
+                <AddTaskIcon onClick={() => setShowPopup(true)}>
+                  <PlusCircle size={32} />
+                </AddTaskIcon>
               </th>
             </tr>
             <tr>
@@ -206,26 +212,22 @@ function App() {
               <Quadrant
                 quadrant={1}
                 tasks={tasks}
-                addTask={addTask}
                 moveTask={moveTask}
+                reorderTask={reorderTask}
                 setTaskDueDate={setTaskDueDate}
                 toggleTaskCompletion={toggleTaskCompletion}
                 deleteTask={deleteTask}
                 toggleTaskTimer={toggleTaskTimer}
-                taskInputs={taskInputs}
-                setTaskInputs={setTaskInputs}
               />
               <Quadrant
                 quadrant={2}
                 tasks={tasks}
-                addTask={addTask}
                 moveTask={moveTask}
+                reorderTask={reorderTask}
                 setTaskDueDate={setTaskDueDate}
                 toggleTaskCompletion={toggleTaskCompletion}
                 deleteTask={deleteTask}
                 toggleTaskTimer={toggleTaskTimer}
-                taskInputs={taskInputs}
-                setTaskInputs={setTaskInputs}
               />
             </tr>
             <tr>
@@ -233,30 +235,27 @@ function App() {
               <Quadrant
                 quadrant={3}
                 tasks={tasks}
-                addTask={addTask}
                 moveTask={moveTask}
+                reorderTask={reorderTask}
                 setTaskDueDate={setTaskDueDate}
                 toggleTaskCompletion={toggleTaskCompletion}
                 deleteTask={deleteTask}
                 toggleTaskTimer={toggleTaskTimer}
-                taskInputs={taskInputs}
-                setTaskInputs={setTaskInputs}
               />
               <Quadrant
                 quadrant={4}
                 tasks={tasks}
-                addTask={addTask}
                 moveTask={moveTask}
+                reorderTask={reorderTask}
                 setTaskDueDate={setTaskDueDate}
                 toggleTaskCompletion={toggleTaskCompletion}
                 deleteTask={deleteTask}
                 toggleTaskTimer={toggleTaskTimer}
-                taskInputs={taskInputs}
-                setTaskInputs={setTaskInputs}
               />
             </tr>
           </tbody>
         </MatrixTable>
+        <TaskPopup showPopup={showPopup} setShowPopup={setShowPopup} addTask={addTask} />
       </AppContainer>
     </DndProvider>
   );
@@ -265,39 +264,27 @@ function App() {
 function Quadrant({
   quadrant,
   tasks,
-  addTask,
   moveTask,
+  reorderTask,
   setTaskDueDate,
   toggleTaskCompletion,
   deleteTask,
   toggleTaskTimer,
-  taskInputs,
-  setTaskInputs,
 }) {
-  const [{ isOver }, drop] = useDrop(() => ({
+  const [{ isOver }, drop] = useDrop({
     accept: "TASK",
-    drop: (item) => moveTask(item.id, quadrant),
-    collect: (monitor) => ({ isOver: !!monitor.isOver() }),
-  }));
-
-  const handleInputChange = (quadrant, value) => {
-    setTaskInputs({ ...taskInputs, [quadrant]: value });
-  };
+    drop: (item) => {
+      if (item.quadrant !== quadrant) {
+        moveTask(item.id, quadrant);
+      }
+    },
+    collect: (monitor) => ({
+      isOver: !!monitor.isOver(),
+    }),
+  });
 
   return (
     <QuadrantCell ref={drop} isOver={isOver}>
-      <TaskInput>
-        <TaskInputField
-          type="text"
-          placeholder="Enter Task"
-          value={taskInputs[quadrant]}
-          onChange={(e) => handleInputChange(quadrant, e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && addTask(quadrant)}
-        />
-        <TaskIcon hoverColor="#2196f3" onClick={() => addTask(quadrant)}>
-          <PlusCircle size={16} />
-        </TaskIcon>
-      </TaskInput>
       <TaskList
         quadrant={quadrant}
         tasks={tasks}
@@ -305,6 +292,7 @@ function Quadrant({
         toggleTaskCompletion={toggleTaskCompletion}
         deleteTask={deleteTask}
         toggleTaskTimer={toggleTaskTimer}
+        reorderTask={reorderTask}
       />
     </QuadrantCell>
   );
@@ -317,19 +305,23 @@ function TaskList({
   toggleTaskCompletion,
   deleteTask,
   toggleTaskTimer,
+  reorderTask,
 }) {
   const quadrantTasks = tasks.filter((task) => task.quadrant === quadrant);
 
   return (
     <TaskListContainer>
-      {quadrantTasks.map((task) => (
+      {quadrantTasks.map((task, index) => (
         <Task
           key={task.id}
           task={task}
+          index={index}
+          quadrant={quadrant}
           setTaskDueDate={setTaskDueDate}
           toggleTaskCompletion={toggleTaskCompletion}
           deleteTask={deleteTask}
           toggleTaskTimer={toggleTaskTimer}
+          reorderTask={reorderTask}
         />
       ))}
     </TaskListContainer>
@@ -338,22 +330,37 @@ function TaskList({
 
 function Task({
   task,
+  index,
+  quadrant,
   setTaskDueDate,
   toggleTaskCompletion,
   deleteTask,
   toggleTaskTimer,
+  reorderTask,
 }) {
-  const [{ isDragging }, drag] = useDrag(() => ({
+  const [{ isDragging }, drag] = useDrag({
     type: "TASK",
-    item: { id: task.id },
+    item: { id: task.id, index, quadrant },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
-  }));
+  });
+
+  const [, drop] = useDrop({
+    accept: "TASK",
+    hover: (item) => {
+      if (item.id !== task.id && item.quadrant === quadrant) {
+        const dragIndex = item.index;
+        const hoverIndex = index;
+        reorderTask(item.id, hoverIndex, quadrant);
+        item.index = hoverIndex;
+      }
+    },
+  });
 
   return (
     <TaskItem
-      ref={drag}
+      ref={(node) => drag(drop(node))}
       isDragging={isDragging}
       completed={task.completed}
     >
@@ -372,6 +379,7 @@ function Task({
       </TaskContent>
       <TaskDueDate
         type="date"
+        value={task.dueDate}
         onChange={(e) => setTaskDueDate(task.id, e.target.value)}
       />
     </TaskItem>
