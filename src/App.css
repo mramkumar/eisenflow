@@ -1,0 +1,97 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.matrix-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  text-align: left;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #ddd;
+}
+
+.matrix-table {
+  width: 100%;
+  height: 100vh;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  table-layout: fixed; /* Keep this fixed for consistent column widths */
+}
+
+.matrix-table th,
+.matrix-table td {
+  padding: 15px;
+  border: 1px solid #ddd;
+}
+
+/* Urgent and Not Urgent headers */
+.urgent-header,
+.not-urgent-header {
+  width: 25%; /* These columns take more space */
+  min-width: 150px;
+  text-align: center;
+  vertical-align: middle;
+  font-weight: bold;
+  padding: 10px;
+}
+
+.urgent-header {
+  background-color: #ffcccb;
+  color: #d32f2f;
+}
+
+.not-urgent-header {
+  background-color: #c8e6c9;
+  color: #388e3c;
+}
+
+/* Important and Not Important headers */
+.important-header,
+.not-important-header {
+  width: 1px !important; /* Force the column to be as thin as possible */
+  min-width: 1px !important; /* Prevent any minimum width from being applied */
+  text-align: center;
+  vertical-align: middle;
+  font-weight: bold;
+  padding: 10px 5px !important; /* Reduce horizontal padding */
+  font-size: 0.9rem; /* Smaller font size */
+  writing-mode: vertical-rl; /* Vertical text */
+  transform: rotate(180deg); /* Rotate text */
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+.important-header {
+  background-color: #bbdefb;
+  color: #1976d2;
+}
+
+.not-important-header {
+  background-color: #fff9c4;
+  color: #f57f17;
+}
+
+/* Adjust the vertical text alignment */
+.important-header span,
+.not-important-header span {
+  display: inline-block;
+  transform: translateY(10px); /* Fine-tune vertical position */
+}
+
+/* Quadrant cells */
+.quadrant {
+  background-color: #fafafa;
+  transition: background-color 0.3s ease;
+  height: calc(50vh - 60px);
+  overflow-y: auto;
+}
+
+.quadrant.highlight {
+  background-color: #e0f7fa;
+}
