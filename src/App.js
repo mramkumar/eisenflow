@@ -136,7 +136,11 @@ function App() {
   };
 
   const moveTask = (taskId, newQuadrant) => {
-    setTasks(tasks.map((task) => (task.id === taskId ? { ...task, quadrant: newQuadrant } : task)));
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId ? { ...task, quadrant: newQuadrant } : task
+      )
+    );
   };
 
   const setTaskDueDate = (taskId, dueDate) => {
@@ -183,7 +187,7 @@ function App() {
     <DndProvider backend={HTML5Backend}>
       <AppContainer>
         <MatrixTable>
-        <MatrixColGroup />
+          <MatrixColGroup />
           <thead>
             <tr>
               <th colSpan="3" className="matrix-title">
