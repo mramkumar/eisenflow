@@ -6,6 +6,7 @@ import styled from "styled-components";
 import "./App.css";
 import TaskPopup from "./components/TaskPopup";
 import EditTaskPopup from "./components/EditTaskPopup";
+import ViewTaskPopup from "./components/ViewTaskPopup";
 
 const AppContainer = styled.div`
   display: flex;
@@ -80,18 +81,17 @@ const TaskCheckbox = styled.span`
   color: #64b5f6;
 `;
 
-const TaskText = styled.span`
-  flex: 1;
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
 const TaskTextContainer = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
+`;
+
+const TaskText = styled.span`
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const TaskDescription = styled.p`
@@ -103,18 +103,18 @@ const TaskDescription = styled.p`
   padding: 0;
 `;
 
-const TaskIconContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-`;
-
 const TaskTimer = styled.span`
   display: flex;
   align-items: center;
   gap: 5px;
   font-size: 0.9rem;
   color: #555;
+`;
+
+const TaskIconContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
 `;
 
 const TaskIcon = styled.span`
@@ -147,12 +147,14 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [showEditPopup, setShowEditPopup] = useState(false);
+  const [showViewPopup, setShowViewPopup] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
 
   const addTask = (newTask) => {
     const task = {
       id: Date.now(),
       text: newTask.text,
+      description: newTask.description,
       quadrant: newTask.quadrant,
       completed: false,
       dueDate: newTask.dueDate,
@@ -257,6 +259,7 @@ function App() {
                 toggleTaskTimer={toggleTaskTimer}
                 setCurrentTask={setCurrentTask}
                 setShowEditPopup={setShowEditPopup}
+                setShowViewPopup={setShowViewPopup}
               />
               <Quadrant
                 quadrant={2}
@@ -269,6 +272,7 @@ function App() {
                 toggleTaskTimer={toggleTaskTimer}
                 setCurrentTask={setCurrentTask}
                 setShowEditPopup={setShowEditPopup}
+                setShowViewPopup={setShowViewPopup}
               />
             </tr>
             <tr>
@@ -284,6 +288,7 @@ function App() {
                 toggleTaskTimer={toggleTaskTimer}
                 setCurrentTask={setCurrentTask}
                 setShowEditPopup={setShowEditPopup}
+                setShowViewPopup={setShowViewPopup}
               />
               <Quadrant
                 quadrant={4}
@@ -296,18 +301,27 @@ function App() {
                 toggleTaskTimer={toggleTaskTimer}
                 setCurrentTask={setCurrentTask}
                 setShowEditPopup={setShowEditPopup}
+                setShowViewPopup={setShowViewPopup}
               />
             </tr>
           </tbody>
         </MatrixTable>
         <TaskPopup showPopup={showPopup} setShowPopup={setShowPopup} addTask={addTask} />
         {currentTask && (
-          <EditTaskPopup
-            showPopup={showEditPopup}
-            setShowPopup={setShowEditPopup}
-            task={currentTask}
-            updateTask={updateTask}
-          />
+          <>
+            <EditTaskPopup
+              showPopup={showEditPopup}
+              setShowPopup={setShowEditPopup}
+              task={currentTask}
+              updateTask={updateTask}
+            />
+            <ViewTaskPopup
+              showPopup={showViewPopup}
+              setShowPopup={setShowViewPopup}
+              task={currentTask}
+              updateTask={updateTask}
+            />
+          </>
         )}
       </AppContainer>
     </DndProvider>
@@ -325,6 +339,7 @@ function Quadrant({
   toggleTaskTimer,
   setCurrentTask,
   setShowEditPopup,
+  setShowViewPopup,
 }) {
   const [{ isOver }, drop] = useDrop({
     accept: "TASK",
@@ -350,6 +365,7 @@ function Quadrant({
         reorderTask={reorderTask}
         setCurrentTask={setCurrentTask}
         setShowEditPopup={setShowEditPopup}
+        setShowViewPopup={setShowViewPopup}
       />
     </QuadrantCell>
   );
@@ -365,6 +381,7 @@ function TaskList({
   reorderTask,
   setCurrentTask,
   setShowEditPopup,
+  setShowViewPopup,
 }) {
   const quadrantTasks = tasks.filter((task) => task.quadrant === quadrant);
 
@@ -383,6 +400,7 @@ function TaskList({
           reorderTask={reorderTask}
           setCurrentTask={setCurrentTask}
           setShowEditPopup={setShowEditPopup}
+          setShowViewPopup={setShowViewPopup}
         />
       ))}
     </TaskListContainer>
@@ -400,6 +418,7 @@ function Task({
   reorderTask,
   setCurrentTask,
   setShowEditPopup,
+  setShowViewPopup,
 }) {
   const [{ isDragging }, drag] = useDrag({
     type: "TASK",
@@ -426,6 +445,7 @@ function Task({
       ref={(node) => drag(drop(node))}
       isDragging={isDragging}
       completed={task.completed}
+      onClick={() => { setCurrentTask(task); setShowViewPopup(true); }}
     >
       <TaskContent>
         <TaskCheckbox onClick={() => toggleTaskCompletion(task.id)}>
@@ -438,7 +458,7 @@ function Task({
         <TaskIconContainer>
           <TaskTimer>
             {formatTime(task.timer)}
-            <TaskIcon hoverColor="#2196f3" onClick={() => toggleTaskTimer(task.id)}> 
+            <TaskIcon hoverColor="#2196f3" onClick={() => toggleTaskTimer(task.id)}>
               {task.isRunning ? <StopCircle size={16} /> : <Play size={16} />}
             </TaskIcon>
           </TaskTimer>
