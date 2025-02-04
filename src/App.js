@@ -40,6 +40,7 @@ const QuadrantCell = styled.td`
   overflow-y: auto;
   padding: 15px;
   border: 1px solid #ddd;
+  width: 50%;
 `;
 
 const TaskListContainer = styled.div`
@@ -64,12 +65,14 @@ const TaskItem = styled.div`
   background-color: ${({ completed }) => (completed ? "#e8f5e9" : "#fff")};
   text-decoration: ${({ completed }) => (completed ? "line-through" : "none")};
   color: ${({ completed }) => (completed ? "#666" : "#000")};
+  width: 100%;
 `;
 
 const TaskContent = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
 `;
 
 const TaskCheckbox = styled.span`
@@ -80,9 +83,15 @@ const TaskCheckbox = styled.span`
 const TaskText = styled.span`
   flex: 1;
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const TaskTimer = styled.span`
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-size: 0.9rem;
   color: #555;
 `;
@@ -402,22 +411,24 @@ function Task({
           {task.completed ? <CheckCircle size={16} /> : <Circle size={16} />}
         </TaskCheckbox>
         <TaskText>{task.text}</TaskText>
-        <TaskTimer>{formatTime(task.timer)}</TaskTimer>
-        <TaskIcon hoverColor="#2196f3" onClick={() => toggleTaskTimer(task.id)}>
-          {task.isRunning ? <StopCircle size={16} /> : <Play size={16} />}
+        <TaskTimer>
+          {formatTime(task.timer)}
+          <TaskIcon hoverColor="#2196f3" onClick={() => toggleTaskTimer(task.id)}>
+            {task.isRunning ? <StopCircle size={16} /> : <Play size={16} />}
+          </TaskIcon>
+        </TaskTimer>
+        <TaskIcon hoverColor="#ff9800" onClick={() => { setCurrentTask(task); setShowEditPopup(true); }}>
+          <Edit3 size={16} />
         </TaskIcon>
         <TaskIcon hoverColor="#d32f2f" onClick={() => deleteTask(task.id)}>
           <Trash2 size={16} />
         </TaskIcon>
-        <TaskIcon hoverColor="#ff9800" onClick={() => { setCurrentTask(task); setShowEditPopup(true); }}>
-          <Edit3 size={16} />
-        </TaskIcon>
+        <TaskDueDate
+          type="date"
+          value={task.dueDate}
+          onChange={(e) => setTaskDueDate(task.id, e.target.value)}
+        />
       </TaskContent>
-      <TaskDueDate
-        type="date"
-        value={task.dueDate}
-        onChange={(e) => setTaskDueDate(task.id, e.target.value)}
-      />
     </TaskItem>
   );
 }
