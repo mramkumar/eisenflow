@@ -67,6 +67,24 @@ const EditTaskPopup = ({ showPopup, setShowPopup, task, updateTask }) => {
     }
   }, [showPopup, task]);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Enter") {
+        handleUpdateTask();
+      }
+    };
+
+    if (showPopup) {
+      window.addEventListener("keydown", handleKeyDown);
+    } else {
+      window.removeEventListener("keydown", handleKeyDown);
+    }
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [showPopup, editedTask]);
+
   const handleUpdateTask = () => {
     if (!editedTask.text.trim()) return;
     updateTask(editedTask);
