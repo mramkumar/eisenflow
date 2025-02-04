@@ -58,39 +58,19 @@ const CloseIcon = styled.span`
   color: #555;
 `;
 
-const TaskPopup = ({ showPopup, setShowPopup, addTask }) => {
-  const [newTask, setNewTask] = useState({ text: "", dueDate: "", quadrant: 1 });
+const EditTaskPopup = ({ showPopup, setShowPopup, task, updateTask }) => {
+  const [editedTask, setEditedTask] = useState({ ...task });
 
   useEffect(() => {
     if (showPopup) {
-      const currentDate = new Date().toISOString().split("T")[0];
-      setNewTask((prevTask) => ({ ...prevTask, dueDate: currentDate }));
+      setEditedTask({ ...task });
     }
-  }, [showPopup]);
+  }, [showPopup, task]);
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Enter") {
-        handleAddTask();
-      }
-    };
-
-    if (showPopup) {
-      window.addEventListener("keydown", handleKeyDown);
-    } else {
-      window.removeEventListener("keydown", handleKeyDown);
-    }
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [showPopup, newTask]);
-
-  const handleAddTask = () => {
-    if (!newTask.text.trim()) return;
-    addTask(newTask);
+  const handleUpdateTask = () => {
+    if (!editedTask.text.trim()) return;
+    updateTask(editedTask);
     setShowPopup(false);
-    setNewTask({ text: "", dueDate: "", quadrant: 1 });
   };
 
   const handleClose = (e) => {
@@ -107,31 +87,31 @@ const TaskPopup = ({ showPopup, setShowPopup, addTask }) => {
         <CloseIcon onClick={() => setShowPopup(false)}>
           <X size={24} />
         </CloseIcon>
-        <h3>Add Task</h3>
+        <h3>Edit Task</h3>
         <PopupInput
           type="text"
           placeholder="Task Name"
-          value={newTask.text}
-          onChange={(e) => setNewTask({ ...newTask, text: e.target.value })}
+          value={editedTask.text}
+          onChange={(e) => setEditedTask({ ...editedTask, text: e.target.value })}
         />
         <PopupInput
           type="date"
-          value={newTask.dueDate}
-          onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
+          value={editedTask.dueDate}
+          onChange={(e) => setEditedTask({ ...editedTask, dueDate: e.target.value })}
         />
         <PopupSelect
-          value={newTask.quadrant}
-          onChange={(e) => setNewTask({ ...newTask, quadrant: parseInt(e.target.value) })}
+          value={editedTask.quadrant}
+          onChange={(e) => setEditedTask({ ...editedTask, quadrant: parseInt(e.target.value) })}
         >
           <option value={1}>Important & Urgent</option>
           <option value={2}>Important & Not Urgent</option>
           <option value={3}>Not Important & Urgent</option>
           <option value={4}>Not Important & Not Urgent</option>
         </PopupSelect>
-        <PopupButton onClick={handleAddTask}>Add Task</PopupButton>
+        <PopupButton onClick={handleUpdateTask}>Update Task</PopupButton>
       </PopupContent>
     </PopupOverlay>
   );
 };
 
-export default TaskPopup;
+export default EditTaskPopup;

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { PlusCircle, CheckCircle, Circle, Trash2, Play, StopCircle } from "lucide-react";
+import { PlusCircle, CheckCircle, Circle, Trash2, Play, StopCircle, Edit3 } from "lucide-react";
 import styled from "styled-components";
 import "./App.css";
 import TaskPopup from "./components/TaskPopup";
+import EditTaskPopup from "./components/EditTaskPopup";
 
 const AppContainer = styled.div`
   display: flex;
@@ -115,6 +116,8 @@ const AddTaskIcon = styled.span`
 function App() {
   const [tasks, setTasks] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
+  const [showEditPopup, setShowEditPopup] = useState(false);
+  const [currentTask, setCurrentTask] = useState(null);
 
   const addTask = (newTask) => {
     const task = {
@@ -127,6 +130,10 @@ function App() {
       isRunning: false,
     };
     setTasks([...tasks, task]);
+  };
+
+  const updateTask = (updatedTask) => {
+    setTasks(tasks.map((task) => (task.id === updatedTask.id ? updatedTask : task)));
   };
 
   const moveTask = (taskId, newQuadrant) => {
@@ -218,6 +225,8 @@ function App() {
                 toggleTaskCompletion={toggleTaskCompletion}
                 deleteTask={deleteTask}
                 toggleTaskTimer={toggleTaskTimer}
+                setCurrentTask={setCurrentTask}
+                setShowEditPopup={setShowEditPopup}
               />
               <Quadrant
                 quadrant={2}
@@ -228,6 +237,8 @@ function App() {
                 toggleTaskCompletion={toggleTaskCompletion}
                 deleteTask={deleteTask}
                 toggleTaskTimer={toggleTaskTimer}
+                setCurrentTask={setCurrentTask}
+                setShowEditPopup={setShowEditPopup}
               />
             </tr>
             <tr>
@@ -241,6 +252,8 @@ function App() {
                 toggleTaskCompletion={toggleTaskCompletion}
                 deleteTask={deleteTask}
                 toggleTaskTimer={toggleTaskTimer}
+                setCurrentTask={setCurrentTask}
+                setShowEditPopup={setShowEditPopup}
               />
               <Quadrant
                 quadrant={4}
@@ -251,11 +264,21 @@ function App() {
                 toggleTaskCompletion={toggleTaskCompletion}
                 deleteTask={deleteTask}
                 toggleTaskTimer={toggleTaskTimer}
+                setCurrentTask={setCurrentTask}
+                setShowEditPopup={setShowEditPopup}
               />
             </tr>
           </tbody>
         </MatrixTable>
         <TaskPopup showPopup={showPopup} setShowPopup={setShowPopup} addTask={addTask} />
+        {currentTask && (
+          <EditTaskPopup
+            showPopup={showEditPopup}
+            setShowPopup={setShowEditPopup}
+            task={currentTask}
+            updateTask={updateTask}
+          />
+        )}
       </AppContainer>
     </DndProvider>
   );
@@ -270,6 +293,8 @@ function Quadrant({
   toggleTaskCompletion,
   deleteTask,
   toggleTaskTimer,
+  setCurrentTask,
+  setShowEditPopup,
 }) {
   const [{ isOver }, drop] = useDrop({
     accept: "TASK",
@@ -293,6 +318,8 @@ function Quadrant({
         deleteTask={deleteTask}
         toggleTaskTimer={toggleTaskTimer}
         reorderTask={reorderTask}
+        setCurrentTask={setCurrentTask}
+        setShowEditPopup={setShowEditPopup}
       />
     </QuadrantCell>
   );
@@ -306,6 +333,8 @@ function TaskList({
   deleteTask,
   toggleTaskTimer,
   reorderTask,
+  setCurrentTask,
+  setShowEditPopup,
 }) {
   const quadrantTasks = tasks.filter((task) => task.quadrant === quadrant);
 
@@ -322,6 +351,8 @@ function TaskList({
           deleteTask={deleteTask}
           toggleTaskTimer={toggleTaskTimer}
           reorderTask={reorderTask}
+          setCurrentTask={setCurrentTask}
+          setShowEditPopup={setShowEditPopup}
         />
       ))}
     </TaskListContainer>
@@ -337,6 +368,8 @@ function Task({
   deleteTask,
   toggleTaskTimer,
   reorderTask,
+  setCurrentTask,
+  setShowEditPopup,
 }) {
   const [{ isDragging }, drag] = useDrag({
     type: "TASK",
@@ -375,6 +408,9 @@ function Task({
         </TaskIcon>
         <TaskIcon hoverColor="#d32f2f" onClick={() => deleteTask(task.id)}>
           <Trash2 size={16} />
+        </TaskIcon>
+        <TaskIcon hoverColor="#ff9800" onClick={() => { setCurrentTask(task); setShowEditPopup(true); }}>
+          <Edit3 size={16} />
         </TaskIcon>
       </TaskContent>
       <TaskDueDate
