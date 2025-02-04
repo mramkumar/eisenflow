@@ -31,6 +31,13 @@ const PopupInput = styled.input`
   border-radius: 4px;
 `;
 
+const PopupTextarea = styled.textarea`
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: none;
+`;
+
 const PopupSelect = styled.select`
   padding: 8px;
   border: 1px solid #ddd;
@@ -111,6 +118,12 @@ const EditTaskPopup = ({ showPopup, setShowPopup, task, updateTask }) => {
           placeholder="Task Name"
           value={editedTask.text}
           onChange={(e) => setEditedTask({ ...editedTask, text: e.target.value })}
+        />
+        <PopupTextarea
+          placeholder="Task Description"
+          value={editedTask.description}
+          maxLength={500}
+          onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
         />
         <PopupInput
           type="date"

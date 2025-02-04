@@ -31,6 +31,13 @@ const PopupInput = styled.input`
   border-radius: 4px;
 `;
 
+const PopupTextarea = styled.textarea`
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: none;
+`;
+
 const PopupSelect = styled.select`
   padding: 8px;
   border: 1px solid #ddd;
@@ -59,7 +66,7 @@ const CloseIcon = styled.span`
 `;
 
 const TaskPopup = ({ showPopup, setShowPopup, addTask }) => {
-  const [newTask, setNewTask] = useState({ text: "", dueDate: "", quadrant: 1 });
+  const [newTask, setNewTask] = useState({ text: "", description: "", dueDate: "", quadrant: 1 });
 
   useEffect(() => {
     if (showPopup) {
@@ -90,7 +97,7 @@ const TaskPopup = ({ showPopup, setShowPopup, addTask }) => {
     if (!newTask.text.trim()) return;
     addTask(newTask);
     setShowPopup(false);
-    setNewTask({ text: "", dueDate: "", quadrant: 1 });
+    setNewTask({ text: "", description: "", dueDate: "", quadrant: 1 });
   };
 
   const handleClose = (e) => {
@@ -113,6 +120,12 @@ const TaskPopup = ({ showPopup, setShowPopup, addTask }) => {
           placeholder="Task Name"
           value={newTask.text}
           onChange={(e) => setNewTask({ ...newTask, text: e.target.value })}
+        />
+        <PopupTextarea
+          placeholder="Task Description"
+          value={newTask.description}
+          maxLength={500}
+          onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
         />
         <PopupInput
           type="date"
