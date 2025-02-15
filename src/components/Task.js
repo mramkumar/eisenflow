@@ -57,6 +57,7 @@ const TaskIconContainer = styled.div`
   align-items: center;
   gap: 10px;
   flex-shrink: 0; /* Prevent shrinking */
+  margin-left: auto; /* Push icons to the right */
 `;
 
 const TaskIcon = styled.span`
@@ -120,7 +121,7 @@ function Task({
           {task.completed ? <CheckCircle size={16} /> : <Circle size={16} />}
         </TaskCheckbox>
         <TaskText onClick={() => { setCurrentTask(task); setShowViewPopup(true); }}>
-          {task.text}
+          {task.title}
         </TaskText>
         <TaskIconContainer>
           <TaskTimer>
@@ -147,6 +148,9 @@ function Task({
 }
 
 function formatTime(seconds) {
+  if (typeof seconds !== 'number' || isNaN(seconds)) {
+    return "0:00";
+  }
   const minutes = Math.floor(seconds / 60);
   const secs = seconds % 60;
   return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;

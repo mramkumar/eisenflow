@@ -20,11 +20,9 @@ function TaskList({
   setShowEditPopup,
   setShowViewPopup,
 }) {
-  const quadrantTasks = tasks.filter((task) => task.quadrant === quadrant);
-
   return (
     <TaskListContainer>
-      {quadrantTasks.map((task, index) => (
+      {tasks.map((task, index) => (
         <Task
           key={task.id}
           task={task}

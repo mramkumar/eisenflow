@@ -38,11 +38,13 @@ function Quadrant({
     }),
   });
 
+  const quadrantTasks = tasks.filter((task) => task.priority === quadrant);
+
   return (
     <QuadrantCell ref={drop} isOver={isOver}>
       <TaskList
         quadrant={quadrant}
-        tasks={tasks}
+        tasks={quadrantTasks}
         setTaskDueDate={setTaskDueDate}
         toggleTaskCompletion={toggleTaskCompletion}
         deleteTask={deleteTask}

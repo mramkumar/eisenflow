@@ -1,0 +1,15 @@
+[Unit]
+Description=Eisenflow Frontend React App
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/eisenflow
+ExecStart=/usr/bin/npm start
+Restart=always
+SyslogIdentifier=eisenflow-frontend
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
+

@@ -24,7 +24,24 @@ function App() {
   const [showViewPopup, setShowViewPopup] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
 
-  const addTask = (newTask) => {
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await fetch("http://192.168.106.101:8000/tasks");
+        if (!response.ok) {
+          throw new Error("Failed to fetch tasks");
+        }
+        const data = await response.json();
+        setTasks(data);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
+    };
+
+    fetchTasks();
+  }, []);
+
+  const addTask = async (newTask) => {
     const task = {
       id: Date.now(),
       text: newTask.text,
@@ -32,12 +49,39 @@ function App() {
       quadrant: newTask.quadrant,
       completed: false,
       dueDate: newTask.dueDate,
-      timer: 0,
+      timer: 0, // Initialize timer to 0
       isRunning: false,
     };
+  
+    // Add the task to the local state
     setTasks([...tasks, task]);
+  
+    // Make an API call to store the task in the database
+    try {
+      const response = await fetch("http://192.168.106.101:8000/task", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: task.text,
+          description: task.description,
+          priority: task.quadrant,
+          assignee: 2, // Assuming assignee is a fixed value for now
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to add task");
+      }
+  
+      const savedTask = await response.json();
+      console.log("Task saved:", savedTask);
+    } catch (error) {
+      console.error("Error adding task:", error);
+    }
   };
-
+  
   const updateTask = (updatedTask) => {
     setTasks(tasks.map((task) => (task.id === updatedTask.id ? updatedTask : task)));
   };
@@ -86,18 +130,6 @@ function App() {
       )
     );
   };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      tasks.forEach((task) => {
-        if (task.isRunning) {
-          updateTaskTimer(task.id);
-        }
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [tasks]);
 
   return (
     <DndProvider backend={HTML5Backend}>

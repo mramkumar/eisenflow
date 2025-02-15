@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import Quadrant from "./Quadrant";
 import { PlusCircle } from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const MatrixTableContainer = styled.table`
   width: 100%;
@@ -20,13 +22,24 @@ const MatrixColGroup = () => (
   </colgroup>
 );
 
+const HeaderContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 10px;
+`;
+
+const RightHeaderContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
 const AddTaskIcon = styled.span`
   cursor: pointer;
   color: #2196f3;
   font-size: 2rem;
-  position: absolute;
-  top: 20px;
-  right: 20px;
 `;
 
 function MatrixTable({
@@ -42,16 +55,28 @@ function MatrixTable({
   setShowViewPopup,
   setShowPopup,
 }) {
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
   return (
     <MatrixTableContainer>
       <MatrixColGroup />
       <thead>
         <tr>
           <th colSpan="3" className="matrix-title">
-            EisenFlow
-            <AddTaskIcon onClick={() => setShowPopup(true)}>
-              <PlusCircle size={32} />
-            </AddTaskIcon>
+            <HeaderContainer>
+              <div>EisenFlow</div>
+              <RightHeaderContainer>
+                <DatePicker
+                  selected={selectedDate}
+                  onChange={(date) => setSelectedDate(date)}
+                  dateFormat="MMMM d, yyyy"
+                  customInput={<CustomDateInput />}
+                />
+                <AddTaskIcon onClick={() => setShowPopup(true)}>
+                  <PlusCircle size={32} />
+                </AddTaskIcon>
+              </RightHeaderContainer>
+            </HeaderContainer>
           </th>
         </tr>
         <tr>
@@ -123,5 +148,11 @@ function MatrixTable({
     </MatrixTableContainer>
   );
 }
+
+const CustomDateInput = React.forwardRef(({ value, onClick }, ref) => (
+  <button className="custom-date-input" onClick={onClick} ref={ref}>
+    {value}
+  </button>
+));
 
 export default MatrixTable;
