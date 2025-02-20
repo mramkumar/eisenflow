@@ -12,8 +12,8 @@ const AppContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  padding: 20px;
+  width: 100%;
+  height: 100%;
   background-color: #f4f4f9;
 `;
 
@@ -24,20 +24,21 @@ function App() {
   const [showViewPopup, setShowViewPopup] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
 
-  useEffect(() => {
-    const fetchTasks = async () => {
+  const fetchTasks = async () => {
       try {
         const response = await fetch("http://192.168.106.101:8000/tasks");
         if (!response.ok) {
           throw new Error("Failed to fetch tasks");
         }
         const data = await response.json();
+        console.log(data)
         setTasks(data);
       } catch (error) {
         console.error("Error fetching tasks:", error);
       }
-    };
+  };
 
+  useEffect(() => {
     fetchTasks();
   }, []);
 
@@ -76,7 +77,7 @@ function App() {
       }
   
       const savedTask = await response.json();
-      console.log("Task saved:", savedTask);
+      fetchTasks();
     } catch (error) {
       console.error("Error adding task:", error);
     }
@@ -111,8 +112,19 @@ function App() {
     setTasks(tasks.map((task) => (task.id === taskId ? { ...task, completed: !task.completed } : task)));
   };
 
-  const deleteTask = (taskId) => {
-    setTasks(tasks.filter((task) => task.id !== taskId));
+  const deleteTask = async (taskId) => {
+
+    try{
+      const response = await fetch(`http://192.168.106.101:8000/task/${taskId}`, {method: "DELETE"});
+
+      if(!response.ok){
+        throw new Error("Failed to delete task");
+      }
+
+      setTasks(tasks.filter((task) => task.id !== taskId));
+    } catch(error) {
+      console.error("Error deleting task:", error);
+    }
   };
 
   const toggleTaskTimer = (taskId) => {

@@ -7,7 +7,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 const MatrixTableContainer = styled.table`
   width: 100%;
-  height: 100vh;
+  height: 100%;
   border-collapse: collapse;
   background-color: #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -41,6 +41,7 @@ const AddTaskIcon = styled.span`
   color: #2196f3;
   font-size: 2rem;
 `;
+
 
 function MatrixTable({
   tasks,
