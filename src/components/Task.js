@@ -37,10 +37,10 @@ const TaskCheckbox = styled.span`
 const TaskText = styled.span`
   flex: 1;
   text-align: left;
-  white-space: nowrap;
+  white-space: wrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 200px; /* Fixed length for task title */
+  max-width: 500px; /* Fixed length for task title */
   cursor: pointer;
 `;
 
