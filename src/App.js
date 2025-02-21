@@ -31,8 +31,12 @@ function App() {
           throw new Error("Failed to fetch tasks");
         }
         const data = await response.json();
-        console.log(data)
-        setTasks(data);
+        const updatedTasks = data.map(task => ({
+          ...task,
+          completed: task.status === 2,
+          dueDate: task.assigned_date
+        }));
+        setTasks(updatedTasks);
       } catch (error) {
         console.error("Error fetching tasks:", error);
       }
@@ -68,6 +72,7 @@ function App() {
           title: task.text,
           description: task.description,
           priority: task.quadrant,
+          assigned_date: task.dueDate,
           assignee: 2, // Assuming assignee is a fixed value for now
         }),
       });
@@ -104,12 +109,55 @@ function App() {
     setTasks(updatedTasks);
   };
 
-  const setTaskDueDate = (taskId, dueDate) => {
-    setTasks(tasks.map((task) => (task.id === taskId ? { ...task, dueDate } : task)));
+  const setTaskDueDate = async (taskId, dueDate) => {
+    try {
+      const response = await fetch(`http://192.168.106.101:8000/task/${taskId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          assigned_date: dueDate,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update task due date");
+      }
+      const updatedTask = await response.json();
+      setTasks(tasks.map((task) => (task.id === taskId ? { ...task, dueDate } : task)));
+    }
+    catch (error) {
+      console.error("Error updating task due date:", error);
+    }
+    
   };
 
-  const toggleTaskCompletion = (taskId) => {
-    setTasks(tasks.map((task) => (task.id === taskId ? { ...task, completed: !task.completed } : task)));
+  const toggleTaskCompletion = async (taskId) => {
+    try{
+      const task = tasks.find((task) => task.id === taskId);
+      const newStatus = task.completed ? 1 : 2;
+      const response = await fetch(`http://192.168.106.101:8000/task/${taskId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: newStatus
+        }),
+      });
+
+      console.log(response);
+      
+      if(!response.ok){
+        throw new Error("Failed to toggle task completion");
+      }
+      const updatedTask = await response.json();
+      setTasks(tasks.map((task) => (task.id === taskId ? { ...task, completed: updatedTask.status === 2 } : task)));
+    }
+    catch(error){
+      console.error("Error toggling task completion:", error);
+    }
   };
 
   const deleteTask = async (taskId) => {
