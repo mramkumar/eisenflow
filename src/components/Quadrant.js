@@ -4,7 +4,6 @@ import styled from "styled-components";
 import TaskList from "./TaskList";
 
 const QuadrantCell = styled.td`
-  background-color: ${({ isOver }) => (isOver ? "#e0f7fa" : "#fafafa")};
   transition: background-color 0.3s ease;
   height: calc(50vh - 60px);
   overflow-y: auto;
@@ -38,10 +37,10 @@ function Quadrant({
     }),
   });
 
-  const quadrantTasks = tasks.filter((task) => task.priority === quadrant);
+  const quadrantTasks = tasks.filter((task) => task.quadrant === quadrant);
 
   return (
-    <QuadrantCell ref={drop} isOver={isOver}>
+    <QuadrantCell ref={drop} style={{ backgroundColor: isOver ? "#e0f7fa" : "#fafafa" }}>
       <TaskList
         quadrant={quadrant}
         tasks={quadrantTasks}

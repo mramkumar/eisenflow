@@ -111,11 +111,7 @@ function Task({
   });
 
   return (
-    <TaskItem
-      ref={(node) => drag(drop(node))}
-      isDragging={isDragging}
-      completed={task.completed}
-    >
+    <TaskItem ref={(node) => drag(drop(node))} isDragging={isDragging} completed={task.completed}>
       <TaskContent>
         <TaskCheckbox onClick={() => toggleTaskCompletion(task.id)}>
           {task.completed ? <CheckCircle size={16} /> : <Circle size={16} />}

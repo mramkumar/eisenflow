@@ -25,21 +25,22 @@ function App() {
   const [currentTask, setCurrentTask] = useState(null);
 
   const fetchTasks = async () => {
-      try {
-        const response = await fetch("http://192.168.106.101:8000/tasks");
-        if (!response.ok) {
-          throw new Error("Failed to fetch tasks");
-        }
-        const data = await response.json();
-        const updatedTasks = data.map(task => ({
-          ...task,
-          completed: task.status === 2,
-          dueDate: task.assigned_date
-        }));
-        setTasks(updatedTasks);
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
+    try {
+      const response = await fetch("http://192.168.106.101:8000/tasks");
+      if (!response.ok) {
+        throw new Error("Failed to fetch tasks");
       }
+      const data = await response.json();
+      const updatedTasks = data.map(task => ({
+        ...task,
+        completed: task.status === 2,
+        dueDate: task.assigned_date,
+        quadrant: task.priority
+      }));
+      setTasks(updatedTasks);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
   };
 
   useEffect(() => {
@@ -92,12 +93,32 @@ function App() {
     setTasks(tasks.map((task) => (task.id === updatedTask.id ? updatedTask : task)));
   };
 
-  const moveTask = (taskId, newQuadrant) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.id === taskId ? { ...task, quadrant: newQuadrant } : task
-      )
-    );
+  const moveTask = async (taskId, newQuadrant) => {
+
+    
+    try {
+      const response = await fetch(`http://192.168.106.101:8000/task/${taskId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          priority: newQuadrant, // Update the priority column in the database
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update task priority");
+      } else {
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task.id === taskId ? { ...task, quadrant: newQuadrant } : task
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error updating task priority:", error);
+    }
   };
 
   const reorderTask = (taskId, targetIndex, targetQuadrant) => {
@@ -130,11 +151,10 @@ function App() {
     catch (error) {
       console.error("Error updating task due date:", error);
     }
-    
   };
 
   const toggleTaskCompletion = async (taskId) => {
-    try{
+    try {
       const task = tasks.find((task) => task.id === taskId);
       const newStatus = task.completed ? 1 : 2;
       const response = await fetch(`http://192.168.106.101:8000/task/${taskId}`, {
@@ -147,30 +167,27 @@ function App() {
         }),
       });
 
-      console.log(response);
-      
-      if(!response.ok){
+      if (!response.ok) {
         throw new Error("Failed to toggle task completion");
       }
       const updatedTask = await response.json();
       setTasks(tasks.map((task) => (task.id === taskId ? { ...task, completed: updatedTask.status === 2 } : task)));
     }
-    catch(error){
+    catch (error) {
       console.error("Error toggling task completion:", error);
     }
   };
 
   const deleteTask = async (taskId) => {
+    try {
+      const response = await fetch(`http://192.168.106.101:8000/task/${taskId}`, { method: "DELETE" });
 
-    try{
-      const response = await fetch(`http://192.168.106.101:8000/task/${taskId}`, {method: "DELETE"});
-
-      if(!response.ok){
+      if (!response.ok) {
         throw new Error("Failed to delete task");
       }
 
       setTasks(tasks.filter((task) => task.id !== taskId));
-    } catch(error) {
+    } catch (error) {
       console.error("Error deleting task:", error);
     }
   };
