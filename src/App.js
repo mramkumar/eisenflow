@@ -23,21 +23,32 @@ function App() {
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [showViewPopup, setShowViewPopup] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  const formatDate = (date) => {
+    return date.toISOString().split('T')[0];
+  };
+
+  const taskDate = formatDate(selectedDate);
 
   const fetchTasks = async () => {
     try {
-      const response = await fetch("http://192.168.106.101:8000/tasks");
+      const response = await fetch(`http://192.168.106.101:8000/tasks?assigned_date=${taskDate}`);
       if (!response.ok) {
         throw new Error("Failed to fetch tasks");
       }
+      
       const data = await response.json();
+
       const updatedTasks = data.map(task => ({
         ...task,
         completed: task.status === 2,
         dueDate: task.assigned_date,
         quadrant: task.priority
       }));
+
       setTasks(updatedTasks);
+
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
@@ -45,7 +56,7 @@ function App() {
 
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [selectedDate]);
 
   const addTask = async (newTask) => {
     const task = {
@@ -58,11 +69,9 @@ function App() {
       timer: 0, // Initialize timer to 0
       isRunning: false,
     };
-  
-    // Add the task to the local state
+
     setTasks([...tasks, task]);
   
-    // Make an API call to store the task in the database
     try {
       const response = await fetch("http://192.168.106.101:8000/task", {
         method: "POST",
@@ -223,6 +232,8 @@ function App() {
           setShowEditPopup={setShowEditPopup}
           setShowViewPopup={setShowViewPopup}
           setShowPopup={setShowPopup}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
         />
         <TaskPopup showPopup={showPopup} setShowPopup={setShowPopup} addTask={addTask} />
         {currentTask && (

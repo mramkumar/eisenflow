@@ -55,9 +55,10 @@ function MatrixTable({
   setShowEditPopup,
   setShowViewPopup,
   setShowPopup,
+  selectedDate,
+  setSelectedDate,
 }) {
-  const [selectedDate, setSelectedDate] = useState(new Date());
-
+  
   return (
     <MatrixTableContainer>
       <MatrixColGroup />
