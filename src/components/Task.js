@@ -97,7 +97,7 @@ function Task({
     <TaskItem ref={(node) => drag(drop(node))} isDragging={isDragging} completed={task.completed}>
       <TaskContent>
         <TaskCheckbox onClick={() => toggleTaskCompletion(task.id)}>
-          {task.completed ? <CheckCircle size={16} /> : <Circle size={16} />}
+          {task.completed ? <CheckCircle size={16} color="green" /> : <Circle size={16} />}
         </TaskCheckbox>
         <TaskText onClick={() => { setCurrentTask(task); setShowViewPopup(true); }}>
           {task.title}

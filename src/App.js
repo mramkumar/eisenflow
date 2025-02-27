@@ -49,6 +49,7 @@ function App() {
         isRunning: false // Ensure isRunning is initialized to false if not present
       }));
 
+      updatedTasks.sort((a, b) => a.completed - b.completed);
       setTasks(updatedTasks);
 
     } catch (error) {
@@ -57,8 +58,9 @@ function App() {
   };
 
   useEffect(() => {
+
     fetchTasks();
-  
+    
     const interval = setInterval(() => {
       setTasks((prevTasks) =>
         prevTasks.map((task) => {
@@ -184,6 +186,7 @@ function App() {
       }
       const updatedTask = await response.json();
       setTasks(tasks.map((task) => (task.id === taskId ? { ...task, dueDate } : task)));
+      fetchTasks();
     }
     catch (error) {
       console.error("Error updating task due date:", error);
@@ -209,6 +212,7 @@ function App() {
       }
       const updatedTask = await response.json();
       setTasks(tasks.map((task) => (task.id === taskId ? { ...task, completed: updatedTask.status === 2 } : task)));
+      fetchTasks();
     }
     catch (error) {
       console.error("Error toggling task completion:", error);
