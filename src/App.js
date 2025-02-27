@@ -45,7 +45,7 @@ function App() {
         completed: task.status === 2,
         dueDate: task.assigned_date,
         quadrant: task.priority,
-        timer: task.timer || 0, // Ensure timer is initialized to 0 if not present
+        timer: task.duration || 0, // Initialize timer from duration or set to 0 if undefined
         isRunning: false // Ensure isRunning is initialized to false if not present
       }));
 
@@ -62,8 +62,9 @@ function App() {
     const interval = setInterval(() => {
       setTasks((prevTasks) =>
         prevTasks.map((task) => {
-          if (task.isRunning && !task.completed) {
-            return { ...task, timer: task.timer + 1 };
+          if (task.isRunning) {
+            const updatedTimer = task.timer + 1;
+            return { ...task, timer: updatedTimer };
           }
           return task;
         })
@@ -72,6 +73,20 @@ function App() {
   
     return () => clearInterval(interval);
   }, [selectedDate]);
+
+  const updateTaskDuration = async (taskId, duration) => {
+    try {
+      await fetch(`http://192.168.106.101:8000/task/${taskId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ duration }),
+      });
+    } catch (error) {
+      console.error("Error updating task duration:", error);
+    }
+  };
 
   const addTask = async (newTask) => {
     const task = {
@@ -216,11 +231,16 @@ function App() {
 
   const toggleTaskTimer = (taskId) => {
     setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.id === taskId
-          ? { ...task, isRunning: !task.isRunning }
-          : { ...task, isRunning: false }
-      )
+      prevTasks.map((task) => {
+        if (task.id === taskId) {
+          const isRunning = !task.isRunning;
+          if (!isRunning) {
+            updateTaskDuration(task.id, task.timer);
+          }
+          return { ...task, isRunning };
+        }
+        return { ...task, isRunning: false };
+      })
     );
   };
 
