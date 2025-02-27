@@ -44,7 +44,9 @@ function App() {
         ...task,
         completed: task.status === 2,
         dueDate: task.assigned_date,
-        quadrant: task.priority
+        quadrant: task.priority,
+        timer: task.timer || 0, // Ensure timer is initialized to 0 if not present
+        isRunning: false // Ensure isRunning is initialized to false if not present
       }));
 
       setTasks(updatedTasks);
@@ -56,6 +58,19 @@ function App() {
 
   useEffect(() => {
     fetchTasks();
+  
+    const interval = setInterval(() => {
+      setTasks((prevTasks) =>
+        prevTasks.map((task) => {
+          if (task.isRunning && !task.completed) {
+            return { ...task, timer: task.timer + 1 };
+          }
+          return task;
+        })
+      );
+    }, 1000); // Update every second
+  
+    return () => clearInterval(interval);
   }, [selectedDate]);
 
   const addTask = async (newTask) => {
@@ -103,8 +118,6 @@ function App() {
   };
 
   const moveTask = async (taskId, newQuadrant) => {
-
-    
     try {
       const response = await fetch(`http://192.168.106.101:8000/task/${taskId}`, {
         method: "PUT",
@@ -202,17 +215,20 @@ function App() {
   };
 
   const toggleTaskTimer = (taskId) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === taskId ? { ...task, isRunning: !task.isRunning } : task
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId
+          ? { ...task, isRunning: !task.isRunning }
+          : { ...task, isRunning: false }
       )
     );
   };
 
   const updateTaskTimer = (taskId) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === taskId && task.isRunning ? { ...task, timer: task.timer + 1 } : task
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId && task.isRunning 
+          ? { ...task, timer: task.timer + 1 } : task
       )
     );
   };
