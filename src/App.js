@@ -24,6 +24,24 @@ function App() {
   const [showViewPopup, setShowViewPopup] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [quadrantNames, setQuadrantNames] = useState([]);
+
+  useEffect(() => {
+    const fetchQuadrantNames = async () => {
+      try {
+        const response = await fetch('http://192.168.106.101:8000/quadrants');
+        if (!response.ok) {
+          throw new Error('Failed to fetch quadrant names');
+        }
+        const data = await response.json();
+        setQuadrantNames(data);
+      } catch (error) {
+        console.error('Error fetching quadrant names:', error);
+      }
+    };
+
+    fetchQuadrantNames();
+  }, []);
 
   const formatDate = (date) => {
     return date.toISOString().split('T')[0];
@@ -299,7 +317,11 @@ function App() {
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
         />
-        <TaskPopup showPopup={showPopup} setShowPopup={setShowPopup} addTask={addTask} />
+        <TaskPopup 
+          showPopup={showPopup} 
+          setShowPopup={setShowPopup} 
+          addTask={addTask}
+          quadrantNames={quadrantNames} />
         {currentTask && (
           <>
             <EditTaskPopup
@@ -307,12 +329,14 @@ function App() {
               setShowPopup={setShowEditPopup}
               task={currentTask}
               updateTask={updateTask}
+              quadrantNames={quadrantNames}
             />
             <ViewTaskPopup
               showPopup={showViewPopup}
               setShowPopup={setShowViewPopup}
               task={currentTask}
               updateTask={updateTask}
+              quadrantNames={quadrantNames}
             />
           </>
         )}

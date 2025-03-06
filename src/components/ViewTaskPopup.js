@@ -38,6 +38,12 @@ const PopupTextarea = styled.textarea`
   resize: none;
 `;
 
+const PopupSelect = styled.select`
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+`;
+
 const PopupButton = styled.button`
   padding: 10px;
   background: #2196f3;
@@ -59,7 +65,7 @@ const CloseIcon = styled.span`
   color: #555;
 `;
 
-const ViewTaskPopup = ({ showPopup, setShowPopup, task, updateTask }) => {
+const ViewTaskPopup = ({ showPopup, setShowPopup, task, updateTask, quadrantNames }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState({});
 
@@ -70,7 +76,7 @@ const ViewTaskPopup = ({ showPopup, setShowPopup, task, updateTask }) => {
   }, [task]);
 
   const handleUpdateTask = () => {
-    if (!editedTask.text.trim()) return;
+    if (!editedTask.title.trim()) return;
     updateTask(editedTask);
     setIsEditing(false);
   };
@@ -94,7 +100,7 @@ const ViewTaskPopup = ({ showPopup, setShowPopup, task, updateTask }) => {
           type="text"
           placeholder="Task Name"
           value={editedTask.title || ""}
-          onChange={(e) => setEditedTask({ ...editedTask, text: e.target.value })}
+          onChange={(e) => setEditedTask({ ...editedTask, title: e.target.value })}
           disabled={!isEditing}
         />
         <PopupTextarea
@@ -110,12 +116,16 @@ const ViewTaskPopup = ({ showPopup, setShowPopup, task, updateTask }) => {
           onChange={(e) => setEditedTask({ ...editedTask, dueDate: e.target.value })}
           disabled={!isEditing}
         />
-        <PopupInput
-          type="text"
+        <PopupSelect
           value={editedTask.quadrant || ""}
           onChange={(e) => setEditedTask({ ...editedTask, quadrant: e.target.value })}
           disabled={!isEditing}
-        />
+        >
+          <option value="" disabled>Select Quadrant</option>
+          {quadrantNames.map((quadrant) => (
+            <option key={quadrant.id} value={quadrant.id}>{quadrant.priority_name}</option>
+          ))}
+        </PopupSelect>
         <PopupButton onClick={() => setIsEditing(!isEditing)}>
           {isEditing ? "Cancel" : "Edit Task"}
         </PopupButton>

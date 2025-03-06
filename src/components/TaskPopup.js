@@ -65,7 +65,7 @@ const CloseIcon = styled.span`
   color: #555;
 `;
 
-const TaskPopup = ({ showPopup, setShowPopup, addTask }) => {
+const TaskPopup = ({ showPopup, setShowPopup, addTask, quadrantNames }) => {
   const [newTask, setNewTask] = useState({ title: "", description: "", dueDate: "", quadrant: 1 });
 
   useEffect(() => {
@@ -136,10 +136,9 @@ const TaskPopup = ({ showPopup, setShowPopup, addTask }) => {
           value={newTask.quadrant}
           onChange={(e) => setNewTask({ ...newTask, quadrant: parseInt(e.target.value) })}
         >
-          <option value={1}>Important & Urgent</option>
-          <option value={2}>Important & Not Urgent</option>
-          <option value={3}>Not Important & Urgent</option>
-          <option value={4}>Not Important & Not Urgent</option>
+          {quadrantNames.map((quadrant) => (
+            <option key={quadrant.id} value={quadrant.id}>{quadrant.priority_name}</option>
+          ))}
         </PopupSelect>
         <PopupButton onClick={handleAddTask}>Add Task</PopupButton>
       </PopupContent>

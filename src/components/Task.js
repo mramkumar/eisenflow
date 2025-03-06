@@ -111,9 +111,6 @@ function Task({
               </TaskIcon>
             )}
           </TaskTimer>
-          <TaskIcon hoverColor="#ff9800" onClick={() => { setCurrentTask(task); setShowEditPopup(true); setShowViewPopup(false); }}>
-            <Edit3 size={16} />
-          </TaskIcon>
           <TaskIcon hoverColor="#d32f2f" onClick={() => deleteTask(task.id)}>
             <Trash2 size={16} />
           </TaskIcon>
