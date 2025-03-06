@@ -66,7 +66,7 @@ const CloseIcon = styled.span`
 `;
 
 const TaskPopup = ({ showPopup, setShowPopup, addTask }) => {
-  const [newTask, setNewTask] = useState({ text: "", description: "", dueDate: "", quadrant: 1 });
+  const [newTask, setNewTask] = useState({ title: "", description: "", dueDate: "", quadrant: 1 });
 
   useEffect(() => {
     if (showPopup) {
@@ -94,10 +94,10 @@ const TaskPopup = ({ showPopup, setShowPopup, addTask }) => {
   }, [showPopup, newTask]);
 
   const handleAddTask = () => {
-    if (!newTask.text.trim()) return;
+    if (!newTask.title.trim()) return;
     addTask(newTask);
     setShowPopup(false);
-    setNewTask({ text: "", description: "", dueDate: "", quadrant: 1 });
+    setNewTask({ title: "", description: "", dueDate: "", quadrant: 1 });
   };
 
   const handleClose = (e) => {
@@ -118,8 +118,8 @@ const TaskPopup = ({ showPopup, setShowPopup, addTask }) => {
         <PopupInput
           type="text"
           placeholder="Task Name"
-          value={newTask.text}
-          onChange={(e) => setNewTask({ ...newTask, text: e.target.value })}
+          value={newTask.title}
+          onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
         />
         <PopupTextarea
           placeholder="Task Description"

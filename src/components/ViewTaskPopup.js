@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { X } from "lucide-react";
 
@@ -61,7 +61,13 @@ const CloseIcon = styled.span`
 
 const ViewTaskPopup = ({ showPopup, setShowPopup, task, updateTask }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedTask, setEditedTask] = useState({ ...task });
+  const [editedTask, setEditedTask] = useState({});
+
+  useEffect(() => {
+    if (task) {
+      setEditedTask({ ...task });
+    }
+  }, [task]);
 
   const handleUpdateTask = () => {
     if (!editedTask.text.trim()) return;
@@ -79,7 +85,7 @@ const ViewTaskPopup = ({ showPopup, setShowPopup, task, updateTask }) => {
 
   return (
     <PopupOverlay onClick={handleClose}>
-      <PopupContent>
+      <PopupContent key={task.id}>
         <CloseIcon onClick={() => setShowPopup(false)}>
           <X size={24} />
         </CloseIcon>
@@ -87,21 +93,27 @@ const ViewTaskPopup = ({ showPopup, setShowPopup, task, updateTask }) => {
         <PopupInput
           type="text"
           placeholder="Task Name"
-          value={editedTask.text}
+          value={editedTask.title || ""}
           onChange={(e) => setEditedTask({ ...editedTask, text: e.target.value })}
           disabled={!isEditing}
         />
         <PopupTextarea
           placeholder="Task Description"
-          value={editedTask.description}
+          value={editedTask.description || ""}
           maxLength={500}
           onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
           disabled={!isEditing}
         />
         <PopupInput
           type="date"
-          value={editedTask.dueDate}
+          value={editedTask.dueDate || ""}
           onChange={(e) => setEditedTask({ ...editedTask, dueDate: e.target.value })}
+          disabled={!isEditing}
+        />
+        <PopupInput
+          type="text"
+          value={editedTask.quadrant || ""}
+          onChange={(e) => setEditedTask({ ...editedTask, quadrant: e.target.value })}
           disabled={!isEditing}
         />
         <PopupButton onClick={() => setIsEditing(!isEditing)}>

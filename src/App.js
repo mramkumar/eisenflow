@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import styled from "styled-components";
@@ -29,6 +29,13 @@ function App() {
     return date.toISOString().split('T')[0];
   };
 
+  const tasksRef = useRef(tasks);
+  const lastUpdateTimeRef = useRef(Date.now());
+
+  useEffect(() => {
+    tasksRef.current = tasks;
+  }, [tasks]);
+
   const taskDate = formatDate(selectedDate);
 
   const fetchTasks = async () => {
@@ -58,23 +65,39 @@ function App() {
   };
 
   useEffect(() => {
-
     fetchTasks();
-    
+  }, [selectedDate]);
+
+  useEffect(() => {
     const interval = setInterval(() => {
+      const now = Date.now();
+      const elapsedTime = Math.floor((now - lastUpdateTimeRef.current) / 1000);
+      lastUpdateTimeRef.current = now;
+
       setTasks((prevTasks) =>
         prevTasks.map((task) => {
           if (task.isRunning) {
-            const updatedTimer = task.timer + 1;
+            const updatedTimer = task.timer + elapsedTime; // Increment timer by elapsed time
             return { ...task, timer: updatedTimer };
           }
           return task;
         })
       );
     }, 1000); // Update every second
+
+    const saveInterval = setInterval(() => {
+      tasksRef.current.forEach((task) => {
+        if (task.isRunning) {
+          updateTaskDuration(task.id, task.timer); // Save the timer value every 1 minute
+        }
+      });
+    }, 60000); // Save to database every 1 minute (60 seconds)
   
-    return () => clearInterval(interval);
-  }, [selectedDate]);
+    return () => {
+      clearInterval(interval);
+      clearInterval(saveInterval);
+    };
+  }, []);
 
   const updateTaskDuration = async (taskId, duration) => {
     try {
@@ -93,7 +116,7 @@ function App() {
   const addTask = async (newTask) => {
     const task = {
       id: Date.now(),
-      text: newTask.text,
+      title: newTask.title,
       description: newTask.description,
       quadrant: newTask.quadrant,
       completed: false,
@@ -111,7 +134,7 @@ function App() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title: task.text,
+          title: task.title,
           description: task.description,
           priority: task.quadrant,
           assigned_date: task.dueDate,
@@ -256,6 +279,7 @@ function App() {
       )
     );
   };
+
 
   return (
     <DndProvider backend={HTML5Backend}>
