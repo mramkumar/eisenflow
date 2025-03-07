@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import Quadrant from "./Quadrant";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Calendar } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -42,6 +42,67 @@ const AddTaskIcon = styled.span`
   font-size: 2rem;
 `;
 
+const CalendarIcon = styled(Calendar)`
+  cursor: pointer;
+  color: #2196f3;
+  font-size: 2rem;
+`;
+
+const CustomDateInput = ({ value, onClick }) => (
+  <div onClick={onClick} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', position: 'relative' }}>
+    <CalendarIcon size={32} style={{ marginBottom: '-70px', marginLeft: '50px' }} />
+    <span style={{ 
+      visibility: 'hidden', 
+      position: 'absolute', 
+      color: '#2196f3', 
+      backgroundColor: '#fff', 
+      borderRadius: '4px', 
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' 
+    }}>
+      {value}
+    </span>
+  </div>
+);
+
+const StyledDatePicker = styled(DatePicker)`
+  .react-datepicker-wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  .react-datepicker__input-container {
+    display: flex;
+    align-items: center;
+  }
+
+  .react-datepicker__input-container input {
+    border: none;
+    background: transparent;
+    font-size: 2rem;
+    color: #2196f3;
+    cursor: pointer;
+  }
+
+  .react-datepicker {
+    font-size: 1rem;
+  }
+
+  .react-datepicker__header {
+    background-color: #2196f3;
+    color: #fff;
+  }
+
+  .react-datepicker__day--selected,
+  .react-datepicker__day--in-selecting-range,
+  .react-datepicker__day--in-range {
+    background-color: #2196f3;
+    color: #fff;
+  }
+
+  .react-datepicker__input-container:hover span {
+    visibility: visible;
+  }
+`;
 
 function MatrixTable({
   tasks,
@@ -55,10 +116,11 @@ function MatrixTable({
   setShowEditPopup,
   setShowViewPopup,
   setShowPopup,
-  selectedDate,
-  setSelectedDate,
+  dateRange,
+  setDateRange,
 }) {
-  
+  const [startDate, endDate] = dateRange;
+
   return (
     <MatrixTableContainer>
       <MatrixColGroup />
@@ -68,11 +130,15 @@ function MatrixTable({
             <HeaderContainer>
               <div>EisenFlow</div>
               <RightHeaderContainer>
-                <DatePicker
-                  selected={selectedDate}
-                  onChange={(date) => setSelectedDate(date)}
+                <StyledDatePicker
+                  selected={startDate}
+                  onChange={(update) => setDateRange(update)}
+                  startDate={startDate}
+                  endDate={endDate}
+                  selectsRange
                   dateFormat="MMMM d, yyyy"
-                  customInput={<CustomDateInput />}
+                  placeholderText="Select a date range"
+                  customInput={<CustomDateInput value={`${startDate ? startDate.toLocaleDateString() : ''} - ${endDate ? endDate.toLocaleDateString() : ''}`} />}
                 />
                 <AddTaskIcon onClick={() => setShowPopup(true)}>
                   <PlusCircle size={32} />
@@ -150,11 +216,5 @@ function MatrixTable({
     </MatrixTableContainer>
   );
 }
-
-const CustomDateInput = React.forwardRef(({ value, onClick }, ref) => (
-  <button className="custom-date-input" onClick={onClick} ref={ref}>
-    {value}
-  </button>
-));
 
 export default MatrixTable;

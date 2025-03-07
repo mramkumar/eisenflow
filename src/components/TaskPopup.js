@@ -18,7 +18,8 @@ const PopupContent = styled.div`
   background: #fff;
   padding: 20px;
   border-radius: 8px;
-  width: 300px;
+  width: 500px;
+  height: 600px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -29,10 +30,12 @@ const PopupInput = styled.input`
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  width: 100%;
 `;
 
 const PopupTextarea = styled.textarea`
-  padding: 8px;
+  padding: 10px;
+  height: 500px;
   border: 1px solid #ddd;
   border-radius: 4px;
   resize: none;
@@ -42,6 +45,7 @@ const PopupSelect = styled.select`
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  width: 100%;
 `;
 
 const PopupButton = styled.button`
@@ -63,6 +67,11 @@ const CloseIcon = styled.span`
   right: 10px;
   cursor: pointer;
   color: #555;
+`;
+
+const FlexContainer = styled.div`
+  display: flex;
+  gap: 10px;
 `;
 
 const TaskPopup = ({ showPopup, setShowPopup, addTask, quadrantNames }) => {
@@ -127,6 +136,7 @@ const TaskPopup = ({ showPopup, setShowPopup, addTask, quadrantNames }) => {
           maxLength={500}
           onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
         />
+        <FlexContainer>
         <PopupInput
           type="date"
           value={newTask.dueDate}
@@ -140,6 +150,7 @@ const TaskPopup = ({ showPopup, setShowPopup, addTask, quadrantNames }) => {
             <option key={quadrant.id} value={quadrant.id}>{quadrant.priority_name}</option>
           ))}
         </PopupSelect>
+        </FlexContainer>
         <PopupButton onClick={handleAddTask}>Add Task</PopupButton>
       </PopupContent>
     </PopupOverlay>
