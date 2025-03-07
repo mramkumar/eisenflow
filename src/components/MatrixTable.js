@@ -12,6 +12,8 @@ const MatrixTableContainer = styled.table`
   background-color: #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   table-layout: fixed;
+  margin-top: -20px;
+  margin-bottom: -10px;
 `;
 
 const MatrixColGroup = () => (
