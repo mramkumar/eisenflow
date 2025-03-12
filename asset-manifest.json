@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/eisenflow/static/css/main.80c51e11.css",
+    "main.js": "/eisenflow/static/js/main.ccbc0e3b.js",
+    "index.html": "/eisenflow/index.html",
+    "main.80c51e11.css.map": "/eisenflow/static/css/main.80c51e11.css.map",
+    "main.ccbc0e3b.js.map": "/eisenflow/static/js/main.ccbc0e3b.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.80c51e11.css",
+    "static/js/main.ccbc0e3b.js"
+  ]
+}
