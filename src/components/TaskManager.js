@@ -4,6 +4,7 @@ import EditTaskPopup from "./EditTaskPopup";
 import ViewTaskPopup from "./ViewTaskPopup";
 import MatrixTable from "./MatrixTable";
 import "react-datepicker/dist/react-datepicker.css";
+import { API_BASE_URL } from './config';
 
 const TaskManager = () => {
   const [tasks, setTasks] = useState([]);
@@ -18,7 +19,7 @@ const TaskManager = () => {
   useEffect(() => {
     const fetchQuadrantNames = async () => {
       try {
-        const response = await fetch('http://192.168.106.101:8000/quadrants');
+        const response = await fetch(`${API_BASE_URL}/quadrants`);
         if (!response.ok) {
           throw new Error('Failed to fetch quadrant names');
         }
@@ -51,7 +52,7 @@ const TaskManager = () => {
     const end = formatDate(endDate);
 
     try {
-      const response = await fetch(`http://192.168.106.101:8000/tasks?start_date=${start}&end_date=${end}`);
+      const response = await fetch(`${API_BASE_URL}/tasks?start_date=${start}&end_date=${end}`);
       if (!response.ok) {
         throw new Error("Failed to fetch tasks");
       }
@@ -112,7 +113,7 @@ const TaskManager = () => {
 
   const updateTaskDuration = async (taskId, duration) => {
     try {
-      await fetch(`http://192.168.106.101:8000/task/${taskId}`, {
+      await fetch(`${API_BASE_URL}/task/${taskId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -139,7 +140,7 @@ const TaskManager = () => {
     setTasks([...tasks, task]);
   
     try {
-      const response = await fetch("http://192.168.106.101:8000/task", {
+      const response = await fetch(`${API_BASE_URL}/task`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -175,7 +176,7 @@ const TaskManager = () => {
     if (task.completed !== updatedTask.completed) changes.status = updatedTask.completed ? 2 : 1;
     
     try {
-      const response = await fetch(`http://192.168.106.101:8000/task/${updatedTask.id}`, {
+      const response = await fetch(`${API_BASE_URL}/task/${updatedTask.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -198,7 +199,7 @@ const TaskManager = () => {
 
   const moveTask = async (taskId, newQuadrant) => {
     try {
-      const response = await fetch(`http://192.168.106.101:8000/task/${taskId}`, {
+      const response = await fetch(`${API_BASE_URL}/task/${taskId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -233,7 +234,7 @@ const TaskManager = () => {
 
   const setTaskDueDate = async (taskId, dueDate) => {
     try {
-      const response = await fetch(`http://192.168.106.101:8000/task/${taskId}`, {
+      const response = await fetch(`${API_BASE_URL}/task/${taskId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -259,7 +260,7 @@ const TaskManager = () => {
     try {
       const task = tasks.find((task) => task.id === taskId);
       const newStatus = task.completed ? 1 : 2;
-      const response = await fetch(`http://192.168.106.101:8000/task/${taskId}`, {
+      const response = await fetch(`${API_BASE_URL}/task/${taskId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -283,7 +284,7 @@ const TaskManager = () => {
 
   const deleteTask = async (taskId) => {
     try {
-      const response = await fetch(`http://192.168.106.101:8000/task/${taskId}`, { method: "DELETE" });
+      const response = await fetch(`${API_BASE_URL}:8000/task/${taskId}`, { method: "DELETE" });
 
       if (!response.ok) {
         throw new Error("Failed to delete task");

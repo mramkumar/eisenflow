@@ -1,15 +1,19 @@
 {
-  "name": "taskmanager-frontend",
+  "homepage": "https://mramkumar.github.io/eisenflow",
+  "name": "eisenflow-frontend",
   "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "proxy": "http://localhost:5000",
   "dependencies": {
+    "@react-oauth/google": "^0.12.1",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.7",
