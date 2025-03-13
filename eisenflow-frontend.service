@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=root
 WorkingDirectory=/root/eisenflow
-ExecStart=/usr/bin/npm start
+ExecStart=/usr/bin/npm start --port 80
 Restart=always
 SyslogIdentifier=eisenflow-frontend
 Environment=NODE_ENV=production
